@@ -674,6 +674,11 @@
               <FileType>1</FileType>
               <FilePath>..\Task\CanSendTask.c</FilePath>
             </File>
+            <File>
+              <FileName>UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Task\UI.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -698,6 +703,11 @@
               <FileName>RefereeBehaviour.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Application\RefereeBehaviour.c</FilePath>
+            </File>
+            <File>
+              <FileName>RM_Cilent_UI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Application\RM_Cilent_UI.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -845,5 +855,14 @@
     </components>
     <files/>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>Infantry_Chassis_V1</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>

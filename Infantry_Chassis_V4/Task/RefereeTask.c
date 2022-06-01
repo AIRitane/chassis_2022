@@ -9,6 +9,8 @@
 #include "fifo.h"
 #include "bsp_referee.h"
 #include "RefereeBehaviour.h"
+#include "RM_Cilent_UI.h"
+#include "CanReceiveDecom.h"
 
 extern osThreadId CanSendHandle;
 extern osThreadId RefereeHandle;
@@ -32,10 +34,11 @@ unpack_data_t referee_unpack_obj;
   * @param[in]      argument: NULL
   * @retval         none
   */
+
 void RefereeTask(void const * argument)
 {
-
-	portTickType judge_task_pre_tick = 0;
+    int k=0,k1=0,k2=0,k3=0;
+		portTickType judge_task_pre_tick = 0;
 	
     init_referee_struct_data();
     fifo_s_init(&referee_fifo, referee_fifo_buf, REFEREE_FIFO_BUF_LENGTH);
@@ -43,7 +46,9 @@ void RefereeTask(void const * argument)
 
     while(1)
     {
-        referee_unpack_fifo_data();
+       
+       referee_unpack_fifo_data();
+				
         osDelayUntil(&judge_task_pre_tick,5);			//5msµÄ½âËãÆµÂÊ
     }
 }

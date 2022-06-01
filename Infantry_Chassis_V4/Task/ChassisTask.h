@@ -6,7 +6,7 @@
 #include "gpio.h"
 
 //60WÏÂÊÇ0.64 
-#define FallowAngle -111//-144
+#define FallowAngle -158
 #define RotingBaseSpeed 0.64
 typedef enum
 {

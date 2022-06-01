@@ -52,6 +52,7 @@ osThreadId ChassisHandle;
 osThreadId RefereeHandle;
 osThreadId DataVsualizatioHandle;
 osThreadId CanSendHandle;
+osThreadId GUIHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -63,6 +64,7 @@ void ChassisTask(void const * argument);
 void RefereeTask(void const * argument);
 void DVTask(void const * argument);
 void CanSendTask(void const * argument);
+void UI(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -128,6 +130,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of CanSend */
   osThreadDef(CanSend, CanSendTask, osPriorityNormal, 0, 512);
   CanSendHandle = osThreadCreate(osThread(CanSend), NULL);
+
+  /* definition and creation of GUI */
+  osThreadDef(GUI, UI, osPriorityNormal, 0, 1024);
+  GUIHandle = osThreadCreate(osThread(GUI), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -223,6 +229,24 @@ __weak void CanSendTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END CanSendTask */
+}
+
+/* USER CODE BEGIN Header_UI */
+/**
+* @brief Function implementing the GUI thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_UI */
+__weak void UI(void const * argument)
+{
+  /* USER CODE BEGIN UI */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END UI */
 }
 
 /* Private application code --------------------------------------------------*/
