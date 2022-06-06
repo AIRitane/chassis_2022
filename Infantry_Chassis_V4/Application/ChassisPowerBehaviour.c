@@ -61,23 +61,28 @@ fp32 watch_new_current;
 extern uint32_t CMSCounter;
 void ChassisReduceRate()
 {
-	//选择电路
-	if((PTZ.ChassisStatueRequest & 0x80) && CapChageVoltage>14 && CMSCounter >100)
-	{
-		CMS_Hub.power_routin = CMS_PR_BuckBoost;
-		robot_level = 3;
-	}
-	else
-	{
-		CMS_Hub.power_routin = CMS_PR_BattDirect;
-	}
-	
 	//计算最终限制功率
+//	robot_level = 3;
 	if(chassis_power_buffer < real_buffer_limit)
-		real_power_limit = (chassis_power_buffer/real_buffer_limit)*real_buffer_limit/2.0f;
+		real_power_limit = (chassis_power_buffer/real_buffer_limit)*real_buffer_limit;
 	else
 	{
-		real_power_limit = power_limit;
+		if(robot_level  == 1)
+		{
+			real_power_limit = 60;
+		}
+		else if(robot_level  == 2)
+		{
+			real_power_limit = 80;
+		}
+		else if(robot_level  == 3)
+		{
+			real_power_limit = 100;
+		}
+		else
+		{
+			real_power_limit = 60;
+		}
 	}
 	
 	//计算拟合功率
@@ -89,31 +94,37 @@ void ChassisReduceRate()
 		total_power += fabs(ChassisCtrl.Current[i] * ChassisCtrl.Motor[i]->speed_rpm)*total_powerKP;
 	}
 	
+		//选择电路
+	if((PTZ.ChassisStatueRequest & 0x80) && CapChageVoltage>14 && CMSCounter >100)
+	{
+		CMS_Hub.power_routin = CMS_PR_BuckBoost;
+		total_power = 0;
+	}
+	else
+	{
+		CMS_Hub.power_routin = CMS_PR_BattDirect;
+	}
+	
 	//计算减幅系数
 	if(total_power>real_power_limit)
 	{
 		SupKp = real_power_limit/total_power;
-		if(ChassisCtrl.Mode == ROTING && chassis_power_buffer == 60)
+		
+		if(ChassisCtrl.Mode == ROTING && (PTZ.FBSpeed == 0 && PTZ.LRSpeed == 0)) 
 		{
-			for(uint32_t i=0;i<4;i++)
-			{
-				ChassisCtrl.Current[i]*= pow(SupKp,0.5);
-			}
+			if(power_limit < 90 && power_limit > 58) SupKp*=1.2;
+			else if(power_limit > 90) SupKp*=1.4;
 		}
-		else
+		else if(ChassisCtrl.Mode == ROTING)
 		{
-			for(uint32_t i=0;i<4;i++)
-			{
-				ChassisCtrl.Current[i]*=SupKp;
-			}
+			if(power_limit < 90 && power_limit > 58) SupKp*=1.3;
+			else if(power_limit > 90) SupKp*=1.6;
+		}			
+		
+		for(uint32_t i=0;i<4;i++)
+		{
+			ChassisCtrl.Current[i]*=SupKp;
 		}
-
-	}
-	
-	watch_new_current = 0;
-	for(uint32_t i=0;i<4;i++)
-	{
-		watch_new_current += fabs(ChassisCtrl.Current[i]);
 	}
 }
 

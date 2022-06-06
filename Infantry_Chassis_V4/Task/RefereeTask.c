@@ -27,8 +27,6 @@ fifo_s_t referee_fifo;
 uint8_t referee_fifo_buf[REFEREE_FIFO_BUF_LENGTH];
 unpack_data_t referee_unpack_obj;
 
-
-
 /**
   * @brief          裁判系统任务
   * @param[in]      argument: NULL
@@ -48,8 +46,8 @@ void RefereeTask(void const * argument)
     {
        
        referee_unpack_fifo_data();
-				
-        osDelayUntil(&judge_task_pre_tick,5);			//5ms的解算频率
+       
+       osDelayUntil(&judge_task_pre_tick,5);			//5ms的解算频率
     }
 }
 

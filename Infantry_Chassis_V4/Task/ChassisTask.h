@@ -5,8 +5,7 @@
 #include "pid.h"
 #include "gpio.h"
 
-//60W下是0.64 
-#define FallowAngle -158
+#define FallowAngle 22
 #define RotingBaseSpeed 0.64
 typedef enum
 {
@@ -16,13 +15,6 @@ typedef enum
 	ROTING
 }ChassisMode_e;
 
-//目前暂时考虑只是简单等级变化制度
-//typedef enum
-//{
-//	LOW,
-//	NORMAL,
-//	HEIGHT,
-//}Roting_Speed_e;
 
 typedef struct
 {

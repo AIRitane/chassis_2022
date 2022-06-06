@@ -7,15 +7,12 @@
 #include "math.h"
 #include "user_lib.h"
 
-
-extern fp32 power_limit;
-
 ChassisCtrl_t ChassisCtrl;
 float XYPid[4][3]={{20000,0,0},
 					{20000,0,0},
 					{20000,0,0},
 					{20000,0,0}};
-float WZPid[3] = {0.04,0.00001,0};
+float WZPid[3] = {0.015,0.00001,0};
 
 BufferFunction_t BufferFunctionX;
 BufferFunction_t BufferFunctionY;
@@ -58,7 +55,7 @@ void ChassisInit()
 	}
 
 	ChassisCtrl.Yaw = GetYawMeasure();
-	PID_init(&ChassisCtrl.WZPid,PID_ANGLE,WZPid,5,0);
+	PID_init(&ChassisCtrl.WZPid,PID_ANGLE,WZPid,1,0);
 	ChassisCtrl.Mode = NOFORCE;
 	BufferFunctionInit(&BufferFunctionX,100);
 	BufferFunctionInit(&BufferFunctionY,100);
@@ -86,45 +83,52 @@ fp32 roting_speed = RotingBaseSpeed;
 fp32 Erro_angle = 0;
 extern fp32 robot_level;
 
-float test = 0;
 void ChassisContolSet()
 {
 	float del = 0;
 	
-	if(robot_level == 1 && ChassisCtrl.Mode == ROTING && power_limit == 60)
+	if(power_limit == 60 && ChassisCtrl.Mode == ROTING)
 	{
-		Erro_angle = -8;
+		Erro_angle = -5;
 	}
-	else if(robot_level == 2 && ChassisCtrl.Mode == ROTING && power_limit == 80)
+	else if(power_limit == 80 && ChassisCtrl.Mode == ROTING)
 	{
-		Erro_angle = -17;
+		Erro_angle = -28;
 	}
-	else if(robot_level == 3 && ChassisCtrl.Mode == ROTING && power_limit == 100)
+	else if(power_limit == 100 && ChassisCtrl.Mode == ROTING)
 	{
-		Erro_angle = -12;
+		Erro_angle = -26;
+	}
+	else if(ChassisCtrl.Mode == ROTING)
+	{
+		Erro_angle = -4;
 	}
 	else
 	{
-		Erro_angle = -3;
+		Erro_angle = 0;
 	}
+	
 	
 	del = FallowAngle - ChassisCtrl.Yaw->angle + Erro_angle;
 	
+
 	BufferFunctionCalc(&BufferFunctionX,PTZ.FBSpeed/32767.f);
 	BufferFunctionCalc(&BufferFunctionY,-PTZ.LRSpeed/32767.f);
+	BufferFunctionX.out = PTZ.FBSpeed/32767.f;
+	BufferFunctionY.out = -PTZ.LRSpeed/32767.f;
+	
 	ChassisCtrl.vx = -BufferFunctionX.out * arm_cos_f32(del/180*PI) + BufferFunctionY.out * arm_sin_f32(del/180*PI);
 	ChassisCtrl.vy = BufferFunctionX.out * arm_sin_f32(del/180*PI) + BufferFunctionY.out * arm_cos_f32(del/180*PI);
 	
-
 	if(ChassisCtrl.Mode == ROTING)
 	{
 		//设置速度等级/旋转等级
-		if(robot_level == 1 && power_limit == 60)
+		if(power_limit == 60)
 		{
 			rote_powkp = 1.2;
 			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
 			{
-				roting_speed = 0.5;
+				roting_speed = 0.49;
 			}
 			else
 			{
@@ -132,41 +136,40 @@ void ChassisContolSet()
 			}
 		}
 		
-		else if(robot_level == 2 && power_limit == 80)
-		{
-			rote_powkp = 1.8;
-			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
-			{
-				roting_speed = 0.60;
-			}
-			else
-			{
-				roting_speed = 0.68;
-			}
-		}
-		else if(robot_level == 3 && power_limit == 100)
+		else if(power_limit == 80)
 		{
 			rote_powkp = 2;
 			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
 			{
-				roting_speed = 0.75;
+				roting_speed = 0.79;
 			}
 			else
 			{
-				roting_speed = 0.8;
+				roting_speed = 0.70;
 			}
 		}
-		//血量优先50W
-		else
+		else if(power_limit == 100)
 		{
-			rote_powkp = 0.8;
+			rote_powkp = 3;
 			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
 			{
-				roting_speed = 0.30;
+				roting_speed = 0.9;
 			}
 			else
 			{
-				roting_speed = 0.40;
+				roting_speed = 0.9;
+			}
+		}
+		else
+		{
+			rote_powkp = 1.1;
+			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
+			{
+				roting_speed = 0.4;
+			}
+			else
+			{
+				roting_speed = 0.45;
 			}
 		}
 		ChassisCtrl.wz = roting_speed;
@@ -174,27 +177,28 @@ void ChassisContolSet()
 	else if(ChassisCtrl.Mode == FALLOW||ChassisCtrl.Mode == STOP)
 	{
 		//设置速度等级
-		if(robot_level == 1 && power_limit == 60)
+		if(power_limit == 60)
 		{
-			rote_powkp = 2;
+			rote_powkp = 3;
 		}
 		
-		else if(robot_level == 2 && power_limit == 80)
+		else if(power_limit == 80)
 		{
 			rote_powkp = 3;
 		}
-		else if(robot_level == 3 && power_limit == 100)
+		else if(power_limit == 100)
 		{
 			rote_powkp = 3;
 		}
-		//血量优先
 		else
 		{
-			rote_powkp = 1.25;
+			rote_powkp = 3;
 		}
 		ChassisCtrl.wz =  PID_calc(&ChassisCtrl.WZPid,ChassisCtrl.Yaw->angle,FallowAngle);
 	}
 	
+	//慢速模式
+	if((PTZ.ChassisStatueRequest & 0x02 )&&(PTZ.ChassisStatueRequest & 0x40 )) rote_powkp=0.5;
 	ChassisCtrl.vx *= rote_powkp;
 	ChassisCtrl.vy *= rote_powkp;
 	ChassisCtrl.wz *=3;

@@ -62,7 +62,7 @@ extern uint32_t CMSCounter;
 void ChassisReduceRate()
 {
 	//计算最终限制功率
-	robot_level = 3;
+//	robot_level = 3;
 	if(chassis_power_buffer < real_buffer_limit)
 		real_power_limit = (chassis_power_buffer/real_buffer_limit)*real_buffer_limit;
 	else
@@ -109,6 +109,18 @@ void ChassisReduceRate()
 	if(total_power>real_power_limit)
 	{
 		SupKp = real_power_limit/total_power;
+		
+		if(ChassisCtrl.Mode == ROTING && (PTZ.FBSpeed == 0 && PTZ.LRSpeed == 0)) 
+		{
+			if(power_limit < 90 && power_limit > 58) SupKp*=1.2;
+			else if(power_limit > 90) SupKp*=1.4;
+		}
+		else if(ChassisCtrl.Mode == ROTING)
+		{
+			if(power_limit < 90 && power_limit > 58) SupKp*=1.2;
+			else if(power_limit > 90) SupKp*=1.6;
+		}			
+		
 		for(uint32_t i=0;i<4;i++)
 		{
 			ChassisCtrl.Current[i]*=SupKp;
