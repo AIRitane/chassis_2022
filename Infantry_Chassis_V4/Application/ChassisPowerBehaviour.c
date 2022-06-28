@@ -42,6 +42,7 @@ void ChassisPowerloop()
 	chassis_power = power_heat_data_t.chassis_power;
 	chassis_power_buffer = power_heat_data_t.chassis_power_buffer;
 	power_limit = robot_state.chassis_power_limit;
+	if(power_limit == 0) power_limit=50;
 	robot_level = robot_state.robot_level;
 	
 	//超级电容充电电流
@@ -49,7 +50,7 @@ void ChassisPowerloop()
 	available_current = power_limit/ chassis_volt;
 	remain_current = available_current - (fp32)power_heat_data_t.chassis_current / 1000;
 	
-	if(remain_current<0)
+	if(remain_current<0 || CapChageVoltage>19.5)
 	{
 		remain_current = 0;
 	}
@@ -98,7 +99,7 @@ void ChassisReduceRate()
 	if((PTZ.ChassisStatueRequest & 0x80) && CapChageVoltage>14 && CMSCounter >100)
 	{
 		CMS_Hub.power_routin = CMS_PR_BuckBoost;
-		total_power = 0;
+		real_power_limit = 150;
 	}
 	else
 	{
@@ -112,14 +113,19 @@ void ChassisReduceRate()
 		
 		if(ChassisCtrl.Mode == ROTING && (PTZ.FBSpeed == 0 && PTZ.LRSpeed == 0)) 
 		{
-			if(power_limit < 90 && power_limit > 58) SupKp*=1.2;
-			else if(power_limit > 90) SupKp*=1.4;
+			if(power_limit < 90 && power_limit > 65) SupKp*=1.2;
+			else if(power_limit > 90) SupKp*=1.5;
 		}
 		else if(ChassisCtrl.Mode == ROTING)
 		{
 			if(power_limit < 90 && power_limit > 58) SupKp*=1.3;
-			else if(power_limit > 90) SupKp*=1.6;
-		}			
+			else if(power_limit > 90) SupKp*=1.7;
+		}
+		else if(ChassisCtrl.Mode == FALLOW)
+		{
+			if(power_limit < 90 && power_limit > 58) SupKp*=1.2;
+			else if(power_limit > 90) SupKp*=1.5;
+		}
 		
 		for(uint32_t i=0;i<4;i++)
 		{

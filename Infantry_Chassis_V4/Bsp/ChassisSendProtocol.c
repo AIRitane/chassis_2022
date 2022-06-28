@@ -40,6 +40,7 @@ uint8_t *send_bullet_speed(void)
 			BulletSpeed[1] = (uint8_t)(0x122);
 			BulletSpeed[2] = 4;
 			memcpy(BulletSpeed+3,&shoot_data_t.bullet_speed,4);
+			break;
 		}
 		case 2://机器人小枪口1
 		{
@@ -47,6 +48,7 @@ uint8_t *send_bullet_speed(void)
 			BulletSpeed[1] = (uint8_t)(0x123);
 			BulletSpeed[2] = 4;
 			memcpy(BulletSpeed+3,&shoot_data_t.bullet_speed,4);
+			break;
 		}
 		case 3://机器人大枪口
 		{
@@ -54,6 +56,7 @@ uint8_t *send_bullet_speed(void)
 			BulletSpeed[1] = (uint8_t)(0x124);
 			BulletSpeed[2] = 4;
 			memcpy(BulletSpeed+3,&shoot_data_t.bullet_speed,4);
+			break;
 		}
 	}
 	return BulletSpeed;
@@ -125,11 +128,26 @@ uint8_t *send_enemy_information(void)
 		enemy_information.infantry5_remain_HP = game_robot_HP_t.blue_5_robot_HP;
 	}
 	memset(EnemyInformation,0,sizeof(EnemyInformation));
-	EnemyInformation[0] = (uint8_t)(0x12A >> 8);;
+	EnemyInformation[0] = (uint8_t)(0x12A >> 8);
 	EnemyInformation[1] = (uint8_t)(0x12A);
-	EnemyInformation[1] = 8;
+	EnemyInformation[2] = 8;
 	memcpy((EnemyInformation+3),&enemy_information,8);
 	return EnemyInformation;
 }
 
-
+//发送比赛状态信息
+uint8_t GAMESTATUS[11];
+send_game_status_t SendGameStatus;
+uint8_t *send_game_status(void)
+{
+	SendGameStatus.game_status = game_state.game_type<<4;
+	SendGameStatus.game_status |= game_state.game_progress;
+	SendGameStatus.end_time = game_state.stage_remain_time;
+	
+	memset(GAMESTATUS,0,sizeof(GAMESTATUS));
+	GAMESTATUS[0] = (uint8_t)(0x12B >> 8);
+	GAMESTATUS[1] = (uint8_t)(0x12B);
+	GAMESTATUS[2] = 3;
+	memcpy((GAMESTATUS+3),&SendGameStatus,3);
+	return GAMESTATUS;
+}

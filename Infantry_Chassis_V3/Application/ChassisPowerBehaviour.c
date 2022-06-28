@@ -94,11 +94,11 @@ void ChassisReduceRate()
 		total_power += fabs(ChassisCtrl.Current[i] * ChassisCtrl.Motor[i]->speed_rpm)*total_powerKP;
 	}
 	
-		//选择电路
+	//选择电路
 	if((PTZ.ChassisStatueRequest & 0x80) && CapChageVoltage>14 && CMSCounter >100)
 	{
 		CMS_Hub.power_routin = CMS_PR_BuckBoost;
-		total_power = 0;
+		real_power_limit = 150;
 	}
 	else
 	{

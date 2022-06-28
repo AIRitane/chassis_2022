@@ -12,7 +12,7 @@ float XYPid[4][3]={{20000,0,0},
 					{20000,0,0},
 					{20000,0,0},
 					{20000,0,0}};
-float WZPid[3] = {0.015,0.00001,0};
+float WZPid[3] = {0.005,0.0000,0};
 
 BufferFunction_t BufferFunctionX;
 BufferFunction_t BufferFunctionY;
@@ -55,7 +55,7 @@ void ChassisInit()
 	}
 
 	ChassisCtrl.Yaw = GetYawMeasure();
-	PID_init(&ChassisCtrl.WZPid,PID_ANGLE,WZPid,1,0);
+	PID_init(&ChassisCtrl.WZPid,PID_POSITION,WZPid,1000,1);
 	ChassisCtrl.Mode = NOFORCE;
 	BufferFunctionInit(&BufferFunctionX,100);
 	BufferFunctionInit(&BufferFunctionY,100);
@@ -95,7 +95,7 @@ void ChassisContolSet()
 	{
 		Erro_angle = -26;
 	}
-	else if(power_limit == 100 && ChassisCtrl.Mode == ROTING)
+	else if(power_limit >= 100 && ChassisCtrl.Mode == ROTING)
 	{
 		Erro_angle = -26;
 	}
@@ -147,7 +147,7 @@ void ChassisContolSet()
 				roting_speed = 0.79;
 			}
 		}
-		else if(power_limit == 100)
+		else if(power_limit >= 100)
 		{
 			rote_powkp = 3;
 			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
@@ -193,14 +193,15 @@ void ChassisContolSet()
 		{
 			rote_powkp = 3;
 		}
-		ChassisCtrl.wz =  PID_calc(&ChassisCtrl.WZPid,ChassisCtrl.Yaw->angle,FallowAngle);
+		ChassisCtrl.wz = PID_calc(&ChassisCtrl.WZPid,10*theta_format(ChassisCtrl.Yaw->angle-FallowAngle),0);
 	}
 	
 	//ÂýËÙÄ£Ê½
-	if((PTZ.ChassisStatueRequest & 0x02 )&&(PTZ.ChassisStatueRequest & 0x40 )) rote_powkp=0.5;
+	if((PTZ.ChassisStatueRequest & 0x02 )&&(PTZ.ChassisStatueRequest & 0x40 )) rote_powkp=0.35;
 	ChassisCtrl.vx *= rote_powkp;
 	ChassisCtrl.vy *= rote_powkp;
-	ChassisCtrl.wz *=3;
+	if(ChassisCtrl.Mode != FALLOW)
+		ChassisCtrl.wz *=3;
 }
 
 

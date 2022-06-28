@@ -82,7 +82,7 @@ fp32 rote_powkp = 3;
 fp32 roting_speed = RotingBaseSpeed;
 fp32 Erro_angle = 0;
 extern fp32 robot_level;
-
+extern fp32 real_power_limit;
 void ChassisContolSet()
 {
 	float del = 0;
@@ -93,11 +93,11 @@ void ChassisContolSet()
 	}
 	else if(power_limit == 80 && ChassisCtrl.Mode == ROTING)
 	{
-		Erro_angle = -28;
+		Erro_angle = -24;
 	}
-	else if(power_limit == 100 && ChassisCtrl.Mode == ROTING)
+	else if(power_limit >= 100 && ChassisCtrl.Mode == ROTING || real_power_limit==150)
 	{
-		Erro_angle = -26;
+		Erro_angle = -25;
 	}
 	else if(ChassisCtrl.Mode == ROTING)
 	{
@@ -125,14 +125,14 @@ void ChassisContolSet()
 		//设置速度等级/旋转等级
 		if(power_limit == 60)
 		{
-			rote_powkp = 1.2;
+			rote_powkp = 1.1;
 			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
 			{
-				roting_speed = 0.49;
+				roting_speed = 0.35;
 			}
 			else
 			{
-				roting_speed = 0.57;
+				roting_speed = 0.54;
 			}
 		}
 		
@@ -141,31 +141,31 @@ void ChassisContolSet()
 			rote_powkp = 2;
 			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
 			{
-				roting_speed = 0.79;
+				roting_speed = 0.60;
 			}
 			else
 			{
 				roting_speed = 0.70;
 			}
 		}
-		else if(power_limit == 100)
+		else if(power_limit >= 100 || real_power_limit == 150)
 		{
 			rote_powkp = 3;
 			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
 			{
-				roting_speed = 0.9;
+				roting_speed = 0.82;
 			}
 			else
 			{
-				roting_speed = 0.9;
+				roting_speed = 0.77;
 			}
 		}
 		else
 		{
-			rote_powkp = 1.1;
+			rote_powkp = 1;
 			if(PTZ.FBSpeed !=0 || PTZ.LRSpeed !=0)
 			{
-				roting_speed = 0.4;
+				roting_speed = 0.25;
 			}
 			else
 			{
@@ -179,26 +179,26 @@ void ChassisContolSet()
 		//设置速度等级
 		if(power_limit == 60)
 		{
-			rote_powkp = 3;
+			rote_powkp = 1.8;
 		}
 		
 		else if(power_limit == 80)
 		{
-			rote_powkp = 3;
+			rote_powkp = 2.2;
 		}
-		else if(power_limit == 100)
+		else if(power_limit >= 100 || real_power_limit == 150)
 		{
-			rote_powkp = 3;
+			rote_powkp = 2.6;
 		}
 		else
 		{
-			rote_powkp = 3;
+			rote_powkp = 1.5;
 		}
 		ChassisCtrl.wz =  PID_calc(&ChassisCtrl.WZPid,ChassisCtrl.Yaw->angle,FallowAngle);
 	}
 	
 	//慢速模式
-	if((PTZ.ChassisStatueRequest & 0x02 )&&(PTZ.ChassisStatueRequest & 0x40 )) rote_powkp=0.5;
+	if((PTZ.ChassisStatueRequest & 0x02 )&&(PTZ.ChassisStatueRequest & 0x40 )) rote_powkp=0.2;
 	ChassisCtrl.vx *= rote_powkp;
 	ChassisCtrl.vy *= rote_powkp;
 	ChassisCtrl.wz *=3;

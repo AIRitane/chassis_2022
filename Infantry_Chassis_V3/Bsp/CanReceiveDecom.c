@@ -96,21 +96,23 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 				break;
 			}
 			/*-------------------------------------云台数据下发接收-------------------------------------*/
-//			case DefaultAimStatusAndTargetId:
-//			{
-//				memcpy(&Aim,rx_data,sizeof(Aim_t));
-//			}
-//			case SentryAimStatusAndTargetId:
-//			{
-//				//哨兵相关，暂时不管
-//			}
+			case DefaultAimStatusAndTargetId:
+			{
+				memcpy(&Aim,rx_data,sizeof(Aim_t));
+				break;
+			}
+			case SentryAimStatusAndTargetId:
+			{
+				break;//哨兵相关，暂时不管
+			}
 			case DefaulPTZRequestAndStatusId:
 			{
 				memcpy(&PTZ,rx_data,sizeof(PTZ_t));
+				break;
 			}
 			case SentryPTZRequestAndStatusId:
 			{
-				//哨兵相关，不管
+				break;//哨兵相关，不管
 			}
 			default:
 			{
